@@ -261,7 +261,7 @@ CommandDataEnum ParseReceivedString(ReceivedDataStruct *ReceivedData) {
 				(const char*) ReceivedData->receivedStr);
 		int8_t respond = ParseReceivedCommandValue(
 				ReceivedData->receivedCommand,
-				(uint8_t) sizeof(ReceivedData->receivedCommand));
+				(uint8_t) 5);
 		if (respond > -1) {
 			ReceivedData->value = respond;
 			result = CommandDataEnum_CmdPwm;
