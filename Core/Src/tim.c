@@ -21,7 +21,15 @@
 #include "tim.h"
 
 /* USER CODE BEGIN 0 */
+/* Declaration and initialization of callback function */
+static void (*TIM2_ProcessData)(uint8_t data) = 0;
 
+/* Register callback */
+void TIM2_RegisterCallback(void *callback) {
+	if (callback != 0) {
+		TIM2_ProcessData = callback;
+	}
+}
 /* USER CODE END 0 */
 
 /* TIM2 init function */

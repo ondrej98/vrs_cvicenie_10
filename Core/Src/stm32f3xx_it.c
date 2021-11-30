@@ -220,21 +220,7 @@ void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
 	if (LL_TIM_IsActiveFlag_UPDATE(TIM2)) {
-		LL_TIM_OC_SetCompareCH1(TIM2, PWM_Value);
-		if (PWM_Value < PWM_VALUE_MAX && PWM_ValueDirection == Direction_DownUp)
-			PWM_Value += 1;
-		else if (PWM_Value >= PWM_VALUE_MAX
-				&& PWM_ValueDirection == Direction_DownUp) {
-			PWM_ValueDirection = Direction_UpDown;
-			PWM_Value -= 1;
-		} else if (PWM_Value > PWM_VALUE_MIN
-				&& PWM_ValueDirection == Direction_UpDown)
-			PWM_Value -= 1;
-		else if (PWM_Value <= PWM_VALUE_MIN
-				&& PWM_ValueDirection == Direction_UpDown) {
-			PWM_ValueDirection = Direction_DownUp;
-			PWM_Value += 1;
-		}
+		setDutyCycle(PWM_Value);
 	}
   /* USER CODE END TIM2_IRQn 0 */
   /* USER CODE BEGIN TIM2_IRQn 1 */
