@@ -203,10 +203,12 @@ void DMA1_Channel6_IRQHandler(void) {
  */
 void TIM2_IRQHandler(void) {
 	/* USER CODE BEGIN TIM2_IRQn 0 */
-
+	if (LL_TIM_IsActiveFlag_UPDATE(TIM2)) {
+		PWM_Value += 1;
+	}
 	/* USER CODE END TIM2_IRQn 0 */
 	/* USER CODE BEGIN TIM2_IRQn 1 */
-
+	LL_TIM_ClearFlag_UPDATE(TIM2);
 	/* USER CODE END TIM2_IRQn 1 */
 }
 
@@ -215,12 +217,10 @@ void TIM2_IRQHandler(void) {
  */
 void USART2_IRQHandler(void) {
 	/* USER CODE BEGIN USART2_IRQn 0 */
-	if (LL_TIM_IsActiveFlag_UPDATE(TIM2)) {
-		PWM_Value = 0;
-	}
+
 	/* USER CODE END USART2_IRQn 0 */
 	/* USER CODE BEGIN USART2_IRQn 1 */
-	LL_TIM_ClearFlag_UPDATE(TIM2);
+
 	/* USER CODE END USART2_IRQn 1 */
 }
 
@@ -230,7 +230,7 @@ void USART2_IRQHandler(void) {
 void TIM6_DAC1_IRQHandler(void) {
 	/* USER CODE BEGIN TIM6_DAC1_IRQn 0 */
 	if (LL_TIM_IsActiveFlag_UPDATE(TIM6)) {
-		PWM_Value += 1;
+		PWM_Value = 0;
 	}
 	/* USER CODE END TIM6_DAC1_IRQn 0 */
 
