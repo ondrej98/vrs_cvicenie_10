@@ -200,7 +200,7 @@ void setDutyCycle(uint8_t D) {
 	PWM_Value = D;
 }
 
-void proccesDmaData(uint8_t sign) {
+void proccesDmaData(uint8_t sign, uint8_t index, uint16_t length) {
 	static uint8_t receivedLetters = 0;
 	if (sign == SIGN_FILE_START && SignStartDet != 1) {
 		SignStartDet = 1;
@@ -217,9 +217,13 @@ void proccesDmaData(uint8_t sign) {
 	if (SignStartDet
 			== 1&& SignEndDet == 1 && receivedLetters <= SIGN_RECEIVED_MAX_COUNT) {
 		ReceivedDataStr.receivedData = 1;
+		ReceivedDataStr.receivedStr[SIGN_RECEIVED_MAX_COUNT] = 0;
 		SignStartDet = 0;
 	} else if (SignStartDet == 1 && receivedLetters > SIGN_RECEIVED_MAX_COUNT)
 		SignStartDet = 0;
+	if(SignStartDet == 1 && index >= length-1)
+		SignStartDet = 0;
+
 }
 
 uint8_t CountDutyCycleForModeAuto(uint8_t D) {

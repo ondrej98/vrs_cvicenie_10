@@ -16,8 +16,8 @@ main.c:80:5:main	16	static
 main.c:168:6:SystemClock_Config	8	static
 main.c:193:6:setDutyCycle	16	static
 main.c:203:6:proccesDmaData	16	static
-main.c:225:9:CountDutyCycleForModeAuto	16	static
-main.c:239:9:CountDutyCycleForModeMan	16	static
-main.c:246:17:ParseReceivedString	24	static
-main.c:272:8:ParseReceivedCommandValue	56	static
-main.c:292:6:Error_Handler	4	static,ignoring_inline_asm
+main.c:229:9:CountDutyCycleForModeAuto	16	static
+main.c:243:9:CountDutyCycleForModeMan	16	static
+main.c:250:17:ParseReceivedString	24	static
+main.c:276:8:ParseReceivedCommandValue	56	static
+main.c:296:6:Error_Handler	4	static,ignoring_inline_asm

@@ -22,7 +22,7 @@
 
 /* USER CODE BEGIN 0 */
 uint8_t bufferUSART2dma[DMA_USART2_BUFFER_SIZE];
-static void (*USART2_ProcessData)(uint8_t data) = 0;
+static void (*USART2_ProcessData)(uint8_t sign, uint8_t index, uint16_t length) = 0;
 /* USER CODE END 0 */
 
 /* USART2 init function */
@@ -125,7 +125,7 @@ void USART2_CheckDmaReception(void) {
 		if (pos > old_pos) {
 			for (uint8_t i = old_pos; i < pos; i++) {
 				uint8_t sign = bufferUSART2dma[i];
-				USART2_ProcessData(sign);
+				USART2_ProcessData(sign, i, pos);
 			}
 			if (LL_DMA_IsActiveFlag_HT6(DMA1) == SET
 					|| LL_DMA_IsActiveFlag_TC6(DMA1) == SET) {
@@ -138,6 +138,7 @@ void USART2_CheckDmaReception(void) {
 			}
 
 		}
+
 	}
 	old_pos = pos;
 

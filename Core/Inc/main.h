@@ -76,7 +76,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 void setDutyCycle(uint8_t D);
-void proccesDmaData(uint8_t sign);
+void proccesDmaData(uint8_t sign, uint8_t index, uint16_t length);
 uint8_t CountDutyCycleForModeAuto(uint8_t D);
 uint8_t CountDutyCycleForModeMan(uint8_t D, uint8_t reqD);
 /* USER CODE END EFP */
@@ -120,7 +120,7 @@ typedef enum {
 
 typedef struct {
 	uint8_t receivedData;
-	uint8_t receivedStr[SIGN_RECEIVED_MAX_COUNT];
+	uint8_t receivedStr[SIGN_RECEIVED_MAX_COUNT+1];
 	uint8_t receivedCommand[SIGN_RECEIVED_MAX_COUNT];
 	uint8_t value;
 } ReceivedDataStruct;
