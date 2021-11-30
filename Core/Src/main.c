@@ -47,7 +47,9 @@
 
 /* USER CODE BEGIN PV */
 extern uint8_t PWM_Value;
+extern uint8_t PWM_ValueReq;
 extern Direction PWM_ValueDirection;
+extern Mode mode;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -68,7 +70,9 @@ void SystemClock_Config(void);
 int main(void) {
 	/* USER CODE BEGIN 1 */
 	PWM_Value = 0;
+	PWM_ValueReq = 0;
 	PWM_ValueDirection = Direction_DownUp;
+	mode = Mode_Auto;
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -109,12 +113,19 @@ int main(void) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		/*if (PWM_Value < 99)
-		 PWM_Value += 1;
-		 else
-		 PWM_Value = 0;
-		 LL_mDelay(100);*/
-
+		LL_mDelay(5000);
+		mode = Mode_Man;
+		PWM_ValueReq = 80;
+		LL_mDelay(10000);
+		PWM_ValueReq = 50;
+		LL_mDelay(10000);
+		PWM_ValueReq = 20;
+		LL_mDelay(10000);
+		PWM_ValueReq = 50;
+		LL_mDelay(10000);
+		PWM_ValueReq = 80;
+		LL_mDelay(10000);
+		mode = Mode_Auto;
 	}
 	/* USER CODE END 3 */
 }
@@ -149,6 +160,16 @@ void SystemClock_Config(void) {
 
 /* USER CODE BEGIN 4 */
 void setDutyCycle(uint8_t D) {
+	if (mode == Mode_Auto) {
+		D = CountDutyCycleForModeAuto(D);
+		PWM_ValueReq = D;
+	} else if (mode == Mode_Man)
+		D = CountDutyCycleForModeMan(D, PWM_ValueReq);
+	LL_TIM_OC_SetCompareCH1(TIM2, D);
+	PWM_Value = D;
+}
+
+uint8_t CountDutyCycleForModeAuto(uint8_t D) {
 	if (D < PWM_VALUE_MAX && PWM_ValueDirection == Direction_DownUp)
 		D += 1;
 	else if (D >= PWM_VALUE_MAX && PWM_ValueDirection == Direction_DownUp) {
@@ -160,10 +181,14 @@ void setDutyCycle(uint8_t D) {
 		PWM_ValueDirection = Direction_DownUp;
 		D += 1;
 	}
-	LL_TIM_OC_SetCompareCH1(TIM2, D);
-	PWM_Value = D;
+	return D;
 }
-
+uint8_t CountDutyCycleForModeMan(uint8_t D, uint8_t reqD) {
+	if (D != reqD) {
+		D = CountDutyCycleForModeAuto(D);
+	}
+	return D;
+}
 /* USER CODE END 4 */
 
 /**

@@ -71,6 +71,8 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 void setDutyCycle(uint8_t D);
+uint8_t CountDutyCycleForModeAuto(uint8_t D);
+uint8_t CountDutyCycleForModeMan(uint8_t D, uint8_t reqD);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -102,8 +104,15 @@ typedef enum{
 	Direction_DownUp,
 	Direction_UpDown
 } Direction;
+
+typedef enum{
+	Mode_Man,
+	Mode_Auto,
+} Mode;
 uint8_t PWM_Value;
+uint8_t PWM_ValueReq;
 Direction PWM_ValueDirection;
+Mode mode;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

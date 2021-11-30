@@ -59,7 +59,9 @@
 
 /* USER CODE BEGIN EV */
 extern uint8_t PWM_Value;
+extern uint8_t PWM_ValueReq;
 extern Direction PWM_ValueDirection;
+extern Mode mode;
 /* USER CODE END EV */
 
 /******************************************************************************/
