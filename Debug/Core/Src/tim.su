@@ -5,7 +5,6 @@ core_cm4.h:1863:26:NVIC_EncodePriority	40	static
 stm32f3xx_ll_bus.h:287:22:LL_AHB1_GRP1_EnableClock	24	static
 stm32f3xx_ll_bus.h:537:22:LL_APB1_GRP1_EnableClock	24	static
 stm32f3xx_ll_tim.h:1416:22:LL_TIM_EnableCounter	16	static
-stm32f3xx_ll_tim.h:1596:22:LL_TIM_EnableARRPreload	16	static
 stm32f3xx_ll_tim.h:1607:22:LL_TIM_DisableARRPreload	16	static
 stm32f3xx_ll_tim.h:1943:22:LL_TIM_CC_EnableChannel	16	static
 stm32f3xx_ll_tim.h:2383:22:LL_TIM_OC_DisableFast	24	static
@@ -15,4 +14,3 @@ stm32f3xx_ll_tim.h:3419:22:LL_TIM_SetTriggerOutput	16	static
 stm32f3xx_ll_tim.h:3519:22:LL_TIM_DisableMasterSlaveMode	16	static
 stm32f3xx_ll_tim.h:4421:22:LL_TIM_EnableIT_UPDATE	16	static
 tim.c:28:6:MX_TIM2_Init	88	static
-tim.c:87:6:MX_TIM6_Init	32	static

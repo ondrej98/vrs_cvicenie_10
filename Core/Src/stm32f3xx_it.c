@@ -59,6 +59,7 @@
 
 /* USER CODE BEGIN EV */
 extern uint8_t PWM_Value;
+extern Direction PWM_ValueDirection;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -220,10 +221,25 @@ void TIM2_IRQHandler(void)
   /* USER CODE BEGIN TIM2_IRQn 0 */
 	if (LL_TIM_IsActiveFlag_UPDATE(TIM2)) {
 		LL_TIM_OC_SetCompareCH1(TIM2, PWM_Value);
+		if (PWM_Value < PWM_VALUE_MAX && PWM_ValueDirection == Direction_DownUp)
+			PWM_Value += 1;
+		else if (PWM_Value >= PWM_VALUE_MAX
+				&& PWM_ValueDirection == Direction_DownUp) {
+			PWM_ValueDirection = Direction_UpDown;
+			PWM_Value -= 1;
+		} else if (PWM_Value > PWM_VALUE_MIN
+				&& PWM_ValueDirection == Direction_UpDown)
+			PWM_Value -= 1;
+		else if (PWM_Value <= PWM_VALUE_MIN
+				&& PWM_ValueDirection == Direction_UpDown) {
+			PWM_ValueDirection = Direction_DownUp;
+			PWM_Value += 1;
+		}
 	}
   /* USER CODE END TIM2_IRQn 0 */
   /* USER CODE BEGIN TIM2_IRQn 1 */
 	LL_TIM_ClearFlag_UPDATE(TIM2);
+
   /* USER CODE END TIM2_IRQn 1 */
 }
 
@@ -238,20 +254,6 @@ void USART2_IRQHandler(void)
   /* USER CODE BEGIN USART2_IRQn 1 */
 
   /* USER CODE END USART2_IRQn 1 */
-}
-
-/**
-  * @brief This function handles TIM6 global and DAC1 underrun error interrupts.
-  */
-void TIM6_DAC1_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM6_DAC1_IRQn 0 */
-
-  /* USER CODE END TIM6_DAC1_IRQn 0 */
-
-  /* USER CODE BEGIN TIM6_DAC1_IRQn 1 */
-	LL_TIM_ClearFlag_UPDATE(TIM6);
-  /* USER CODE END TIM6_DAC1_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

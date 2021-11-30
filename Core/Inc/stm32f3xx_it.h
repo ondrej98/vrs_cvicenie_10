@@ -59,7 +59,6 @@ void SysTick_Handler(void);
 void DMA1_Channel6_IRQHandler(void);
 void TIM2_IRQHandler(void);
 void USART2_IRQHandler(void);
-void TIM6_DAC1_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */

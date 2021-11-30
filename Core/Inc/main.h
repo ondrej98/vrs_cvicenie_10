@@ -62,7 +62,8 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+#define PWM_VALUE_MIN 0
+#define PWM_VALUE_MAX 99
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
@@ -96,7 +97,13 @@ void Error_Handler(void);
                                                                  0 bit  for subpriority */
 #endif
 /* USER CODE BEGIN Private defines */
+
+typedef enum{
+	Direction_DownUp,
+	Direction_UpDown
+} Direction;
 uint8_t PWM_Value;
+Direction PWM_ValueDirection;
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
