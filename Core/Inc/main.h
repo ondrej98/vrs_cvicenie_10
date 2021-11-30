@@ -1,22 +1,22 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.h
-  * @brief          : Header for main.c file.
-  *                   This file contains the common defines of the application.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.h
+ * @brief          : Header for main.c file.
+ *                   This file contains the common defines of the application.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+ * All rights reserved.</center></h2>
+ *
+ * This software component is licensed by ST under BSD 3-Clause license,
+ * the "License"; You may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at:
+ *                        opensource.org/licenses/BSD-3-Clause
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -47,7 +47,8 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <string.h>
+#include <stdlib.h>
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -57,13 +58,17 @@ extern "C" {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 #define PWM_VALUE_MIN 0
 #define PWM_VALUE_MAX 99
+#define DMA_USART2_BUFFER_SIZE 128
+
+#define SIGN_RECEIVED_MAX_COUNT 36
+#define SIGN_FILE_START '$'
+#define SIGN_FILE_END '$'
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
@@ -71,6 +76,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 void setDutyCycle(uint8_t D);
+void proccesDmaData(uint8_t sign);
 uint8_t CountDutyCycleForModeAuto(uint8_t D);
 uint8_t CountDutyCycleForModeMan(uint8_t D, uint8_t reqD);
 /* USER CODE END EFP */
@@ -100,19 +106,40 @@ uint8_t CountDutyCycleForModeMan(uint8_t D, uint8_t reqD);
 #endif
 /* USER CODE BEGIN Private defines */
 
-typedef enum{
-	Direction_DownUp,
-	Direction_UpDown
+typedef enum {
+	Direction_DownUp, Direction_UpDown
 } Direction;
 
-typedef enum{
-	Mode_Man,
-	Mode_Auto,
+typedef enum {
+	Mode_Man, Mode_Auto,
 } Mode;
+
+typedef enum {
+	CommandDataEnum_None,CommandDataEnum_ModeMan, CommandDataEnum_ModeAuto, CommandDataEnum_CmdPwm
+} CommandDataEnum;
+
+typedef struct {
+	uint8_t receivedData;
+	uint8_t receivedStr[SIGN_RECEIVED_MAX_COUNT];
+	uint8_t receivedCommand[SIGN_RECEIVED_MAX_COUNT];
+	uint8_t value;
+} ReceivedDataStruct;
+
+typedef struct {
+	uint16_t capacity;
+	uint16_t reserved;
+} BufferCapacityStruct;
+
 uint8_t PWM_Value;
 uint8_t PWM_ValueReq;
 Direction PWM_ValueDirection;
 Mode mode;
+CommandDataEnum cmdData;
+BufferCapacityStruct BufferCapacity;
+
+
+CommandDataEnum ParseReceivedString(ReceivedDataStruct *ReceivedData);
+int8_t ParseReceivedCommandValue(uint8_t* cmdData, uint8_t lenght);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

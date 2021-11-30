@@ -75,8 +75,6 @@ void MX_TIM2_Init(void)
   LL_TIM_SetTriggerOutput(TIM2, LL_TIM_TRGO_RESET);
   LL_TIM_DisableMasterSlaveMode(TIM2);
   /* USER CODE BEGIN TIM2_Init 2 */
-  //LL_TIM_EnableIT_UPDATE(TIM2);
-  //LL_TIM_OC_SetCompareCH1(TIM2, 50);
   LL_TIM_EnableCounter(TIM2);
   LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH1);
   //LL_TIM_EnableIT_CC1(TIM2);

@@ -46,10 +46,20 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+const uint8_t CMD_AUTO[] = "auto";
+const uint8_t CMD_MAN[] = "manual";
+const uint8_t CMD_PWM[] = "PWM";
+
 extern uint8_t PWM_Value;
 extern uint8_t PWM_ValueReq;
 extern Direction PWM_ValueDirection;
 extern Mode mode;
+extern CommandDataEnum cmdData;
+extern BufferCapacityStruct BufferCapacity;
+
+ReceivedDataStruct ReceivedDataStr;
+uint8_t SignStartDet = 0;
+uint8_t SignEndDet = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -73,6 +83,10 @@ int main(void) {
 	PWM_ValueReq = 0;
 	PWM_ValueDirection = Direction_DownUp;
 	mode = Mode_Auto;
+	BufferCapacity.capacity = DMA_USART2_BUFFER_SIZE;
+	BufferCapacity.reserved = 0;
+	cmdData = CommandDataEnum_None;
+	ReceivedDataStr.receivedData = 0;
 	/* USER CODE END 1 */
 
 	/* MCU Configuration--------------------------------------------------------*/
@@ -104,7 +118,7 @@ int main(void) {
 	MX_TIM2_Init();
 	/* USER CODE BEGIN 2 */
 	TIM2_RegisterCallback(setDutyCycle);
-
+	USART2_RegisterCallback(proccesDmaData);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -113,19 +127,36 @@ int main(void) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		LL_mDelay(5000);
-		mode = Mode_Man;
-		PWM_ValueReq = 80;
-		LL_mDelay(10000);
-		PWM_ValueReq = 50;
-		LL_mDelay(10000);
-		PWM_ValueReq = 20;
-		LL_mDelay(10000);
-		PWM_ValueReq = 50;
-		LL_mDelay(10000);
-		PWM_ValueReq = 80;
-		LL_mDelay(10000);
-		mode = Mode_Auto;
+		/*LL_mDelay(5000);
+		 mode = Mode_Man;
+		 PWM_ValueReq = 80;
+		 LL_mDelay(10000);
+		 PWM_ValueReq = 50;
+		 LL_mDelay(10000);
+		 PWM_ValueReq = 20;
+		 LL_mDelay(10000);
+		 PWM_ValueReq = 50;
+		 LL_mDelay(10000);
+		 PWM_ValueReq = 80;
+		 LL_mDelay(10000);
+		 mode = Mode_Auto;*/
+		if (ReceivedDataStr.receivedData == 1) {
+			CommandDataEnum respond = ParseReceivedString(&ReceivedDataStr);
+			switch (respond) {
+			default:
+				break;
+			case CommandDataEnum_ModeAuto:
+				mode = Mode_Auto;
+				break;
+			case CommandDataEnum_ModeMan:
+				mode = Mode_Man;
+				break;
+			case CommandDataEnum_CmdPwm:
+				PWM_ValueReq = ReceivedDataStr.value;
+				break;
+			}
+			ReceivedDataStr.receivedData = 0;
+		}
 	}
 	/* USER CODE END 3 */
 }
@@ -169,6 +200,28 @@ void setDutyCycle(uint8_t D) {
 	PWM_Value = D;
 }
 
+void proccesDmaData(uint8_t sign) {
+	static uint8_t receivedLetters = 0;
+	if (sign == SIGN_FILE_START && SignStartDet != 1) {
+		SignStartDet = 1;
+		SignEndDet = 0;
+		receivedLetters = 0;
+	} else if (SignStartDet == 1 && receivedLetters < SIGN_RECEIVED_MAX_COUNT) {
+		if (sign == SIGN_FILE_END) {
+			SignEndDet = 1;
+		} else {
+			ReceivedDataStr.receivedStr[receivedLetters] = sign;
+		}
+		receivedLetters++;
+	}
+	if (SignStartDet
+			== 1&& SignEndDet == 1 && receivedLetters <= SIGN_RECEIVED_MAX_COUNT) {
+		ReceivedDataStr.receivedData = 1;
+		SignStartDet = 0;
+	} else if (SignStartDet == 1 && receivedLetters > SIGN_RECEIVED_MAX_COUNT)
+		SignStartDet = 0;
+}
+
 uint8_t CountDutyCycleForModeAuto(uint8_t D) {
 	if (D < PWM_VALUE_MAX && PWM_ValueDirection == Direction_DownUp)
 		D += 1;
@@ -188,6 +241,47 @@ uint8_t CountDutyCycleForModeMan(uint8_t D, uint8_t reqD) {
 		D = CountDutyCycleForModeAuto(D);
 	}
 	return D;
+}
+
+CommandDataEnum ParseReceivedString(ReceivedDataStruct *ReceivedData) {
+	CommandDataEnum result = CommandDataEnum_None;
+	if (strstr((const char*) ReceivedData->receivedStr,
+			(const char*) CMD_AUTO) != NULL) {
+		strcpy((char*) ReceivedData->receivedCommand,
+				(const char*) ReceivedData->receivedStr);
+		result = CommandDataEnum_ModeAuto;
+	} else if (strstr((const char*) ReceivedData->receivedStr,
+			(const char*) CMD_MAN) != NULL) {
+		strcpy((char*) ReceivedData->receivedCommand,
+				(const char*) ReceivedData->receivedStr);
+		result = CommandDataEnum_ModeMan;
+	} else if (strstr((const char*) ReceivedData->receivedStr,
+			(const char*) CMD_PWM) != NULL) {
+		strcpy((char*) ReceivedData->receivedCommand,
+				(const char*) ReceivedData->receivedStr);
+		int8_t respond = ParseReceivedCommandValue(
+				ReceivedData->receivedCommand,
+				(uint8_t) sizeof(ReceivedData->receivedCommand));
+		if (respond > -1) {
+			ReceivedData->value = respond;
+			result = CommandDataEnum_CmdPwm;
+		}
+	}
+	return result;
+}
+int8_t ParseReceivedCommandValue(uint8_t *cmdData, uint8_t lenght) {
+	uint8_t result = -1;
+	uint8_t array[SIGN_RECEIVED_MAX_COUNT] = { 0 };
+	uint8_t index = 0;
+	for (uint8_t i = 0; i < lenght; i++) {
+		uint8_t chr = cmdData[i];
+		if (chr >= '0' && chr <= '9') {
+			array[index++] = chr;
+		}
+	}
+	if (index > 0)
+		result = atoi((const char*) array);
+	return result;
 }
 /* USER CODE END 4 */
 
