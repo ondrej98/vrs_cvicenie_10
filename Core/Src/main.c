@@ -241,6 +241,12 @@ uint8_t CountDutyCycleForModeAuto(uint8_t D) {
 	return D;
 }
 uint8_t CountDutyCycleForModeMan(uint8_t D, uint8_t reqD) {
+	if (D > reqD && PWM_ValueDirection != Direction_UpDown){
+		PWM_ValueDirection = Direction_UpDown;
+	}
+	else if (D < reqD && PWM_ValueDirection != Direction_DownUp){
+		PWM_ValueDirection = Direction_DownUp;
+	}
 	if (D != reqD) {
 		D = CountDutyCycleForModeAuto(D);
 	}
